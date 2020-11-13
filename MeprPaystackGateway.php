@@ -112,6 +112,12 @@ class MeprPaystackGateway extends MeprBaseRealGateway
 
     // Handle zero decimal currencies in Paystack
     $amount = (MeprUtils::is_zero_decimal_currency()) ? MeprUtils::format_float(($txn->total), 0) : MeprUtils::format_float(($txn->total * 100), 0);
+    
+    $custom_data[] = [
+	'display_name' => 'Plugin Name',
+	'variable_name' => 'plugin_name',
+	'value' => $this->paystack_api->plugin_name
+    ];
 
     // Initialize the charge on Paystack's servers - this will charge the user's card
     $args = MeprHooks::apply_filters('mepr_paystack_payment_args', array(
@@ -126,7 +132,8 @@ class MeprPaystackGateway extends MeprBaseRealGateway
         'transaction_id' => $txn->id,
         'trial_payment'  => $trial,
         'site_url'       => esc_url(get_site_url()),
-        'ip_address'     => $_SERVER['REMOTE_ADDR']
+        'ip_address'     => $_SERVER['REMOTE_ADDR'],
+        'custom_fields' => $custom_data
       )
     ), $txn);
 
@@ -223,7 +230,7 @@ class MeprPaystackGateway extends MeprBaseRealGateway
     $mepr_options = MeprOptions::fetch();
     $sub = $txn->subscription();
 
-    //Handle Free Trial period stuff
+    // Handle Free Trial period stuff
     if ($sub->trial) {
       //Prepare the $txn for the process_payment method
       $txn->set_subtotal($sub->trial_amount);
@@ -234,13 +241,6 @@ class MeprPaystackGateway extends MeprBaseRealGateway
 
     error_log("********** MeprPaystackGateway::process_create_subscription Subscription:\n" . MeprUtils::object_to_string($sub));
 
-    // Get the customer
-    // $customer = $this->paystack_customer($txn->subscription_id);
-
-    // $sub->subscr_id = $customer->customer_code;
-    // $sub->subscr_id = 'ts_' . uniqid();
-    // $sub->store();
-
     // Get the plan
     $plan = $this->paystack_plan($txn->subscription(), true);
 
@@ -249,6 +249,12 @@ class MeprPaystackGateway extends MeprBaseRealGateway
 
     // Default to 0 for infinite occurrences
     $total_occurrences = $sub->limit_cycles ? $sub->limit_cycles_num : 0;
+	  
+    $custom_data[] = [
+	'display_name' => 'Plugin Name',
+	'variable_name' => 'plugin_name',
+	'value' => $this->paystack_api->plugin_name
+    ];
 
     $args = MeprHooks::apply_filters('mepr_paystack_subscription_args', array(
       'callback_url' => $this->notify_url('callback'),
@@ -264,7 +270,8 @@ class MeprPaystackGateway extends MeprBaseRealGateway
         'transaction_id' => $txn->id,
         'subscription_id' => $sub->id,
         'site_url' => esc_url(get_site_url()),
-        'ip_address' => $_SERVER['REMOTE_ADDR']
+        'ip_address' => $_SERVER['REMOTE_ADDR'],
+	'custom_fields' => $custom_data
       )
     ), $txn, $sub);
 
@@ -517,7 +524,7 @@ class MeprPaystackGateway extends MeprBaseRealGateway
 
     // Make sure there's a valid subscription for this request and this payment hasn't already been recorded
     if (
-       !($sub = $this::get_subscr_by_plan_code($charge->plan['plan_code'])) && MeprTransaction::txn_exists($charge->reference)
+      !($sub = $this::get_subscr_by_plan_code($charge->plan['plan_code'])) && MeprTransaction::txn_exists($charge->reference)
     ) {
       return false;
     }
@@ -855,11 +862,11 @@ class MeprPaystackGateway extends MeprBaseRealGateway
     $mepr_options = MeprOptions::fetch();
     $sub = $txn->subscription();
 
-    //Prepare the $txn for the process_payment method
+    // Prepare the $txn for the process_payment method
     $txn->set_subtotal($sub->trial_amount);
     $txn->status = MeprTransaction::$pending_str;
 
-    //Attempt processing the payment here 
+    // Attempt processing the payment here 
     $this->process_payment($txn, true);
   }
 
@@ -867,7 +874,7 @@ class MeprPaystackGateway extends MeprBaseRealGateway
   {
     $sub = $txn->subscription();
 
-    //Update the txn member vars and store
+    // Update the txn member vars and store
     $txn->txn_type = MeprTransaction::$payment_str;
     $txn->status = MeprTransaction::$complete_str;
     $txn->expires_at = MeprUtils::ts_to_mysql_date(time() + MeprUtils::days($sub->trial_days), 'Y-m-d 23:59:59');
@@ -1303,7 +1310,7 @@ class MeprPaystackGateway extends MeprBaseRealGateway
         if (isset($obj->plan)) {
           // Record subscription for an instant charge
           return $this->record_subscription_payment();
-        } 
+        }
 
         return $this->record_payment();
       } else if ($request->event == 'charge.refunded') {
