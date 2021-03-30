@@ -112,11 +112,11 @@ class MeprPaystackGateway extends MeprBaseRealGateway
 
     // Handle zero decimal currencies in Paystack
     $amount = (MeprUtils::is_zero_decimal_currency()) ? MeprUtils::format_float(($txn->total), 0) : MeprUtils::format_float(($txn->total * 100), 0);
-    
+
     $custom_data[] = [
-	'display_name' => 'Plugin Name',
-	'variable_name' => 'plugin_name',
-	'value' => $this->paystack_api->plugin_name
+      'display_name' => 'Plugin Name',
+      'variable_name' => 'plugin_name',
+      'value' => $this->paystack_api->plugin_name
     ];
 
     // Initialize the charge on Paystack's servers - this will charge the user's card
@@ -239,6 +239,9 @@ class MeprPaystackGateway extends MeprBaseRealGateway
       return $txn;
     }
 
+    // Handle zero decimal currencies in Paystack
+    $amount = (MeprUtils::is_zero_decimal_currency()) ? MeprUtils::format_float(($txn->total), 0) : MeprUtils::format_float(($txn->total * 100), 0);
+
     error_log("********** MeprPaystackGateway::process_create_subscription Subscription:\n" . MeprUtils::object_to_string($sub));
 
     // Get the plan
@@ -249,14 +252,15 @@ class MeprPaystackGateway extends MeprBaseRealGateway
 
     // Default to 0 for infinite occurrences
     $total_occurrences = $sub->limit_cycles ? $sub->limit_cycles_num : 0;
-	  
+
     $custom_data[] = [
-	'display_name' => 'Plugin Name',
-	'variable_name' => 'plugin_name',
-	'value' => $this->paystack_api->plugin_name
+      'display_name' => 'Plugin Name',
+      'variable_name' => 'plugin_name',
+      'value' => $this->paystack_api->plugin_name
     ];
 
     $args = MeprHooks::apply_filters('mepr_paystack_subscription_args', array(
+      'amount' => $amount,
       'callback_url' => $this->notify_url('callback'),
       'reference' => $txn->trans_num, // MeprTransaction::generate_trans_num(),
       'email' => $usr->user_email,
@@ -271,7 +275,7 @@ class MeprPaystackGateway extends MeprBaseRealGateway
         'subscription_id' => $sub->id,
         'site_url' => esc_url(get_site_url()),
         'ip_address' => $_SERVER['REMOTE_ADDR'],
-	'custom_fields' => $custom_data
+        'custom_fields' => $custom_data
       )
     ), $txn, $sub);
 
