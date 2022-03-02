@@ -1,9 +1,9 @@
 === Paystack MemberPress ===
 Tags: paystack, billing, subscription, payment, memberpress,
 Requires at least: 5.1
-Tested up to: 5.7
+Tested up to: 5.9
 Requires PHP: 7.2
-Stable tag: 1.2
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
