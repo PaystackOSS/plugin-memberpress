@@ -81,3 +81,6 @@ Gateway - This should be set to "Paystack" and will not show up on the frontend.
 Here you can browse the source, look at open issues and keep track of development. 
  
 == Changelog ==
+
+= 1.3.1 - May 9, 2022 =
+* 	Fix: Add support for weekly, quarterly, and yearly plans

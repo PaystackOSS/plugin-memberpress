@@ -57,7 +57,7 @@ Gateway - This should be set to "Paystack" and will not show up on the frontend.
 ## Capabilities of the Paystack Integration
 
 * Process One-Time Payments
-* Process Recurring Payments
+* Process Recurring Payments (Supports weekly, monthly, quarterly and yearly plans)
 * Process Refunds
 * Cancel Recurring Payments
 * Change Credit Card for Recurring Subscription
