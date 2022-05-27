@@ -1140,6 +1140,22 @@ class MeprPaystackGateway extends MeprBaseRealGateway
           <th scope="row"><label><?php _e('Paystack Webhook URL:', 'memberpress'); ?></label></th>
           <td><?php MeprAppHelper::clipboard_input($this->notify_url('whk')); ?></td>
         </tr>
+        <tr valign="top">
+          <td>
+          <div class="callout" style="margin-left: 20px;
+              max-width: 500px;min-width:300px;">
+              <div class="callout-header" style=" padding: 10px 10px;
+              background: #011B33;
+              font-size: 18px;
+              color: white;">Please note</div>
+            
+              <div class="callout-container" style="padding: 5px;
+              background-color: #17dcf83d;
+              color: black">
+                <p style="text-align:start">This plugin only supports weekly, monthly, quarterly and yearly subscription plans.</p>
+              </div>
+          </td>
+        </tr>
       </tbody>
     </table>
   <?php
@@ -1385,10 +1401,22 @@ class MeprPaystackGateway extends MeprBaseRealGateway
     // There's no plan like that so let's create one
     if ($sub->period_type == 'weeks') {
       $interval = 'weekly';
-      // for test purpose 
-      // $interval = 'hourly';
+      if($sub->period >= 3){
+        $interval = 'monthly';
+      }
     } else if ($sub->period_type == 'months') {
-      $interval = 'monthly';
+      if($sub->period == 1){
+        $interval = 'monthly';
+      }
+      else if($sub->period >= 3 || $sub->period <= 6){
+        $interval = 'quarterly';
+      }
+      else if($sub->period > 6){
+        $interval = 'annually';
+      }
+      else{
+        $interval = 'monthly';
+      }
     } else if ($sub->period_type == 'years') {
       $interval = 'annually';
     }
