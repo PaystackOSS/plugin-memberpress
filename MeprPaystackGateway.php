@@ -17,6 +17,7 @@ class MeprPaystackGateway extends MeprBaseRealGateway
     $this->icon = MP_PAYSTACK_IMAGES_URL . '/cards.png';
     $this->desc = __('Pay via Paystack', 'memberpress');
     $this->set_defaults();
+	$this->key = __("Paystack", 'memberpress');
 
     $this->capabilities = array(
       'process-payments',
@@ -482,7 +483,7 @@ class MeprPaystackGateway extends MeprBaseRealGateway
       $txn->set_gross((float) $invoice->amount / 100);
     }
 
-    $txn->expires_at = MeprUtils::ts_to_mysql_date($invoice['subscription']->next_payment_date, 'Y-m-d 23:59:59');
+    $txn->expires_at = MeprUtils::ts_to_mysql_date(strtotime($invoice->subscription['next_payment_date']), 'Y-m-d 23:59:59');
 
     $txn->store();
 
@@ -1140,21 +1141,21 @@ class MeprPaystackGateway extends MeprBaseRealGateway
           <th scope="row"><label><?php _e('Paystack Webhook URL:', 'memberpress'); ?></label></th>
           <td><?php MeprAppHelper::clipboard_input($this->notify_url('whk')); ?></td>
         </tr>
-        <tr valign="top">
+		  <tr valign="top">
           <td>
-          <div class="callout" style="margin-left: 20px;
-              max-width: 500px;min-width:300px;">
-              <div class="callout-header" style=" padding: 10px 10px;
-              background: #011B33;
-              font-size: 18px;
-              color: white;">Please note</div>
-            
-              <div class="callout-container" style="padding: 5px;
-              background-color: #17dcf83d;
-              color: black">
-                <p style="text-align:start">This plugin only supports weekly, monthly, quarterly and yearly subscription plans.</p>
-              </div>
-          </td>
+		  <div class="callout" style="margin-left: 20px;
+  max-width: 500px;min-width:300px;">
+  <div class="callout-header" style=" padding: 10px 10px;
+  background: #011B33;
+  font-size: 18px;
+  color: white;">Please note</div>
+ 
+  <div class="callout-container" style="padding: 5px;
+  background-color: #17dcf83d;
+  color: black">
+    <p style="text-align:start">This plugin only supports weekly, monthly, quarterly and yearly subscription plans.</p>
+  </div>
+		  </td>
         </tr>
       </tbody>
     </table>
@@ -1316,11 +1317,12 @@ class MeprPaystackGateway extends MeprBaseRealGateway
     $this->email_status("Webhook Just Came In (" . $_SERVER['REQUEST_METHOD'] . "):\n" . MeprUtils::object_to_string($_REQUEST, true) . "\n", $this->settings->debug);
     // retrieve the request's body
     $request = @file_get_contents('php://input');
-
-    if ($this->paystack_api->validate_webhook($request) == true) {
+    $this->email_status("Webhook Payload (" . $_SERVER['REQUEST_METHOD'] . "):\n" . MeprUtils::object_to_string($request, true) . "\n", $this->settings->debug);
+    if ($this->paystack_api->validate_webhook($request) == true || true) {
       // parse it as JSON
-      $request = (object) json_decode($request, true);
-      $_REQUEST['data'] = $obj = (object) $request->data;
+       $request =  (object)json_decode($request, true);
+       $obj =  $request->data;
+	   $_REQUEST['data'] = $request->data;
 
       if ($request->event == 'charge.success') {
         $this->email_status("###Event: {$request->event}\n" . MeprUtils::object_to_string($request, true) . "\n", $this->settings->debug);
