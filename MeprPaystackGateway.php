@@ -1317,7 +1317,7 @@ class MeprPaystackGateway extends MeprBaseRealGateway
     $this->email_status("Webhook Just Came In (" . $_SERVER['REQUEST_METHOD'] . "):\n" . MeprUtils::object_to_string($_REQUEST, true) . "\n", $this->settings->debug);
     // retrieve the request's body
     $request = @file_get_contents('php://input');
-    if ($this->paystack_api->validate_webhook($request) == true || true) {
+    if ($this->paystack_api->validate_webhook($request) == true) {
       // parse it as JSON
        $request =  (object)json_decode($request, true);
        $obj =  $request->data;
