@@ -1,19 +1,22 @@
-name: Deploy to WordPress.org
-
+name: Deploy WordPress plugin
 on:
   push:
     branches:
       - master
-      
+
 jobs:
-  tag:
-    name: Deploy
-    runs-on: ubuntu-latest
+  build:
+    name: Deploy WordPress plugin
+    # 2. Specify Linux runner
+    runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@master
-      - name: WordPress Plugin Deploy
-        uses: 10up/action-wordpress-plugin-deploy@stable
+      # 3. Checkout before Use this deployment action
+      - name: Checkout
+        uses: actions/checkout@v3
+      # 4. Use action with environment variable set by secrets
+      - name: Deploy
+        uses: yukihiko-shinoda/action-deploy-wordpress-plugin@v2
         env:
-          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-          SLUG: paystack-memberpress
+          SVN_REPOSITORY_URL: ${{ secrets.SVN_REPO_URL }}
+          SVN_USER_NAME: ${{ secrets.SVN_USERNAME }}
+          SVN_USER_PASSWORD: ${{ secrets.SVN_PASSWORD }}
