@@ -818,14 +818,19 @@ class MeprPaystackGateway extends MeprBaseRealGateway
   {
     $sub = new MeprSubscription($sub_id);
 
+    //Getting the value of the paystack_email_token from the array and storing the value in a variable
+    $array = $sub->get_meta('paystack_email_token');
+    $token = $array[0];
+
+
     if (!isset($sub->id) || (int) $sub->id <= 0)
       throw new MeprGatewayException(__('This subscription is invalid.', 'memberpress'));
 
     $args = MeprHooks::apply_filters('mepr_paystack_cancel_subscription_args', array(
       'code' => $sub->subscr_id,
-      'token' => $sub->get_meta('paystack_email_token'),
+      'token' => $token,
     ), $sub);
-
+    
     // Yeah ... we're cancelling here bro ... but this time we don't want to restart again
     $res = $this->paystack_api->send_request("subscription/disable", $args);
 
