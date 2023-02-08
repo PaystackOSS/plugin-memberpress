@@ -24,7 +24,7 @@ if (is_plugin_active('memberpress/memberpress.php')) {
     define('MP_PAYSTACK_PLUGIN_SLUG', 'paystack-memberpress/main.php');
     define('MP_PAYSTACK_PLUGIN_NAME', 'paystack-memberpress');
     define('MP_PAYSTACK_EDITION', MP_PAYSTACK_PLUGIN_NAME);
-    define('MP_PAYSTACK_PATH', WP_PLUGIN_DIR . '/' . MP_PAYSTACK_PLUGIN_NAME);
+    define('MP_PAYSTACK_PATH', WP_PLUGIN_DIR . '/' . 'plugin-memberpress-master');
 
     $mp_paystack_url_protocol = (is_ssl()) ? 'https' : 'http'; // Make all of our URLS protocol agnostic
     define('MP_PAYSTACK_URL', preg_replace('/^https?:/', "{$mp_paystack_url_protocol}:", plugins_url('/' . MP_PAYSTACK_PLUGIN_NAME)));
