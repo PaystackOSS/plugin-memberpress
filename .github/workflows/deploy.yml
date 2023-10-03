@@ -1,21 +1,29 @@
-name: Deploy WordPress plugin
+name: Deploy to WordPress.org
 on:
-  push:
-    branches: [ master, 'release/v[0-9].[0-9].[0-9]' ]
-
+  release:
+    types: [published]
 jobs:
-  build:
-    name: Deploy WordPress plugin
-    # 2. Specify Linux runner
-    runs-on: ubuntu-20.04
+  tag:
+    name: New release
+    runs-on: ubuntu-latest
     steps:
-      # 3. Checkout before Use this deployment action
-      - name: Checkout
-        uses: actions/checkout@v3
-      # 4. Use action with environment variable set by secrets
-      - name: Deploy
-        uses: yukihiko-shinoda/action-deploy-wordpress-plugin@v2.1.1
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: WordPress Plugin Deploy
+        id: deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        with:
+          generate-zip: true
         env:
-          SVN_REPOSITORY_URL: ${{ secrets.SVN_REPO_URL }}
-          SVN_USER_NAME: ${{ secrets.SVN_USERNAME }}
-          SVN_USER_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: paystack-memberpress
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ steps.deploy.outputs.zip-path }}
+          asset_name: ${{ github.event.repository.name }}.zip
+          asset_content_type: application/zip
