@@ -383,12 +383,30 @@ class MeprPaystackGateway extends MeprBaseRealGateway
 
       // If no trial or trial amount is zero then we've got to make
       // sure the confirmation txn lasts through the trial
-      if (!$sub->trial || ($sub->trial && $sub->trial_amount <= 0.00)) {
-        $trial_days      = ($sub->trial) ? $sub->trial_days : $mepr_options->grace_init_days;
+      // if (!$sub->trial || ($sub->trial && $sub->trial_amount <= 0.00)) {
+      //   $trial_days      = ($sub->trial) ? $sub->trial_days : $mepr_options->grace_init_days;
+      //   $txn->status     = MeprTransaction::$confirmed_str;
+      //   $txn->txn_type   = MeprTransaction::$subscription_confirmation_str;
+      //   $txn->expires_at = MeprUtils::ts_to_mysql_date(time() + MeprUtils::days($trial_days), 'Y-m-d 23:59:59');
+      //   $txn->set_subtotal(0.00); // Just a confirmation txn
+      //   $txn->store();
+      // }
+
+      if (!$sub->trial) {
+        $txn->status     = MeprTransaction::$confirmed_str;
+        $txn->txn_type   = MeprTransaction::$subscription_confirmation_str;
+        $next_payment_date = $sdata->next_payment_date;
+        $txn->expires_at = MeprUtils::ts_to_mysql_date(strtotime($next_payment_date), 'Y-m-d 23:59:59');
+
+        $txn->store();
+      }
+
+      else if($sub->trial && $sub->trial_amount <= 0.00) {
+        $trial_days      = $sub->trial_days;
         $txn->status     = MeprTransaction::$confirmed_str;
         $txn->txn_type   = MeprTransaction::$subscription_confirmation_str;
         $txn->expires_at = MeprUtils::ts_to_mysql_date(time() + MeprUtils::days($trial_days), 'Y-m-d 23:59:59');
-        $txn->set_subtotal(0.00); // Just a confirmation txn
+
         $txn->store();
       }
 
