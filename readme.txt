@@ -84,7 +84,7 @@ Here you can browse the source, look at open issues and keep track of developmen
 == Changelog ==
 
 = 1.3.3 =
-*  Bug fixes
+*  Fixed incorrect date set on expiredOn parameter 
 
 = 1.3.2 - Septmber 26, 2023 =
 *  Compatibility with WordPress 6.3 and PHP 8.2.0
@@ -98,4 +98,4 @@ Here you can browse the source, look at open issues and keep track of developmen
 *  Compatibility with WordPress 6.3 and PHP 8.2.0
 
 = 1.3.3 =
-*  Bug fixes
+*  Fixed incorrect date set on expiredOn parameter 
