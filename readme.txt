@@ -2,7 +2,7 @@
 Contributors: paystack, kaneahabagale
 Tags: paystack, billing, subscription, payment, memberpress,
 Requires at least: 5.1
-Tested up to: 6.3
+Tested up to: 6.6
 Requires PHP: 7.2 and higher
 Stable tag: 1.3.3
 License: GPLv2 or later
@@ -83,6 +83,9 @@ Here you can browse the source, look at open issues and keep track of developmen
  
 == Changelog ==
 
+= 1.3.4 - August 8, 2024 =
+*  Compatibility with WordPress 6.3 and PHP 8.2.0
+
 = 1.3.3 =
 *  Fixed incorrect date set on expiredOn parameter 
 
@@ -93,6 +96,9 @@ Here you can browse the source, look at open issues and keep track of developmen
 * 	Fix: Add support for weekly, quarterly, and yearly plans
 
 == Upgrade Notice ==
+
+= 1.3.3 =
+*  Compatibility with WordPress 6.6 and PHP 8.2.0
 
 = 1.3.2 =
 *  Compatibility with WordPress 6.3 and PHP 8.2.0
