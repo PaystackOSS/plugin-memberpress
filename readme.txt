@@ -2,9 +2,9 @@
 Contributors: paystack, kaneahabagale
 Tags: paystack, billing, subscription, payment, memberpress,
 Requires at least: 5.1
-Tested up to: 6.8.2
+Tested up to: 6.8.3
 Requires PHP: 7.2 and higher
-Stable tag: 1.3.6
+Stable tag: 1.3.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -82,6 +82,9 @@ Gateway - This should be set to "Paystack" and will not show up on the frontend.
 Here you can browse the source, look at open issues and keep track of development. 
  
 == Changelog ==
+
+= 1.3.7 - October 10, 2025 =
+*  Compatibility with WordPress 6.8.3 and PHP 8.2.23
 
 = 1.3.6 - July 21, 2025 =
 *  Compatibility with WordPress 6.8.2 and PHP 8.2.23
