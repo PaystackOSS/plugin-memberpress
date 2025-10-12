@@ -102,6 +102,8 @@ Here you can browse the source, look at open issues and keep track of developmen
 * 	Fix: Add support for weekly, quarterly, and yearly plans
 
 == Upgrade Notice ==
+= 1.3.7 - October 10, 2025 =
+*  Compatibility with WordPress 6.8.3 and PHP 8.2.23
 
 = 1.3.6 - July 21, 2025 =
 *  Compatibility with WordPress 6.8.2 and PHP 8.2.23
