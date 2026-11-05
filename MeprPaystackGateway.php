@@ -68,11 +68,13 @@ class MeprPaystackGateway extends MeprBaseRealGateway
         'api_keys' => array(
           'test' => array(
             'public' => '',
-            'secret' => ''
+            'secret' => '',
+            'webhook_secret' => ''
           ),
           'live' => array(
             'public' => '',
-            'secret' => ''
+            'secret' => '',
+            'webhook_secret' => ''
           )
         )
       ),
@@ -88,12 +90,13 @@ class MeprPaystackGateway extends MeprBaseRealGateway
     //$this->recurrence_type = $this->settings->recurrence_type;
 
     if ($this->is_test_mode()) {
-      $this->settings->public_key = trim($this->settings->api_keys['test']['public']);
-      $this->settings->secret_key = trim($this->settings->api_keys['test']['secret']);
+      $mode = 'test';
     } else {
-      $this->settings->public_key = trim($this->settings->api_keys['live']['public']);
-      $this->settings->secret_key = trim($this->settings->api_keys['live']['secret']);
+      $mode = 'live';
     }
+    $this->settings->public_key = trim($this->settings->api_keys[$mode]['public']);
+    $this->settings->secret_key = trim($this->settings->api_keys[$mode]['secret']);
+    $this->settings->webhook_secret = isset($this->settings->api_keys[$mode]['webhook_secret']) ? trim($this->settings->api_keys[$mode]['webhook_secret']) : '';
   }
 
   /** 
@@ -1110,6 +1113,8 @@ class MeprPaystackGateway extends MeprBaseRealGateway
     $test_public_key      = trim($this->settings->api_keys['test']['public']);
     $live_secret_key      = trim($this->settings->api_keys['live']['secret']);
     $live_public_key      = trim($this->settings->api_keys['live']['public']);
+    $test_webhook_secret  = isset($this->settings->api_keys['test']['webhook_secret']) ? trim($this->settings->api_keys['test']['webhook_secret']) : '';
+    $live_webhook_secret  = isset($this->settings->api_keys['live']['webhook_secret']) ? trim($this->settings->api_keys['live']['webhook_secret']) : '';
     $force_ssl            = ($this->settings->force_ssl == 'on' or $this->settings->force_ssl == true);
     $debug                = ($this->settings->debug == 'on' or $this->settings->debug == true);
     $test_mode            = ($this->settings->test_mode == 'on' or $this->settings->test_mode == true);
@@ -1118,6 +1123,9 @@ class MeprPaystackGateway extends MeprBaseRealGateway
     $test_public_key_str      = "{$mepr_options->integrations_str}[{$this->id}][api_keys][test][public]";
     $live_secret_key_str      = "{$mepr_options->integrations_str}[{$this->id}][api_keys][live][secret]";
     $live_public_key_str      = "{$mepr_options->integrations_str}[{$this->id}][api_keys][live][public]";
+    $test_webhook_secret_str  = "{$mepr_options->integrations_str}[{$this->id}][api_keys][test][webhook_secret]";
+    $live_webhook_secret_str  = "{$mepr_options->integrations_str}[{$this->id}][api_keys][live][webhook_secret]";
+    $webhook_secret_help      = __('Find it in your Paystack Dashboard under Settings > API Keys & Webhooks. Required if you use a restricted key (rk_).', 'memberpress');
     $force_ssl_str            = "{$mepr_options->integrations_str}[{$this->id}][force_ssl]";
     $debug_str                = "{$mepr_options->integrations_str}[{$this->id}][debug]";
     $test_mode_str            = "{$mepr_options->integrations_str}[{$this->id}][test_mode]";
@@ -1132,6 +1140,10 @@ class MeprPaystackGateway extends MeprBaseRealGateway
           <th scope="row"><label for="<?php echo $test_secret_key_str; ?>"><?php _e('Test Secret Key*:', 'memberpress'); ?></label></th>
           <td><input type="text" class="mepr-auto-trim" name="<?php echo $test_secret_key_str; ?>" value="<?php echo $test_secret_key; ?>" /></td>
         </tr>
+        <tr valign="top">
+          <th scope="row"><label for="<?php echo $test_webhook_secret_str; ?>"><?php _e('Test Webhook Signing Secret:', 'memberpress'); ?></label></th>
+          <td><input type="text" class="mepr-auto-trim" name="<?php echo $test_webhook_secret_str; ?>" value="<?php echo esc_attr($test_webhook_secret); ?>" /><p class="description"><?php echo esc_html($webhook_secret_help); ?></p></td>
+        </tr>
       </tbody>
     </table>
     <table id="mepr-paystack-live-keys-<?php echo $this->id; ?>" class="form-table mepr-paystack-live-keys">
@@ -1143,6 +1155,10 @@ class MeprPaystackGateway extends MeprBaseRealGateway
         <tr valign="top">
           <th scope="row"><label for="<?php echo $live_secret_key_str; ?>"><?php _e('Live Secret Key*:', 'memberpress'); ?></label></th>
           <td><input type="text" class="mepr-auto-trim" name="<?php echo $live_secret_key_str; ?>" value="<?php echo $live_secret_key; ?>" /></td>
+        </tr>
+        <tr valign="top">
+          <th scope="row"><label for="<?php echo $live_webhook_secret_str; ?>"><?php _e('Live Webhook Signing Secret:', 'memberpress'); ?></label></th>
+          <td><input type="text" class="mepr-auto-trim" name="<?php echo $live_webhook_secret_str; ?>" value="<?php echo esc_attr($live_webhook_secret); ?>" /><p class="description"><?php echo esc_html($webhook_secret_help); ?></p></td>
         </tr>
       </tbody>
     </table>
