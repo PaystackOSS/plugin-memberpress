@@ -8,12 +8,14 @@ class MeprPaystackAPI
     public $plugin_name;
     protected $public_key;
     protected $secret_key;
+    protected $webhook_secret;
 
     public function __construct($settings)
     {
         $this->plugin_name = 'Memberpress Paystack Gateway Addon';
         $this->secret_key = isset($settings->secret_key) ? $settings->secret_key : '';
         $this->public_key = isset($settings->public_key) ? $settings->public_key : '';
+        $this->webhook_secret = isset($settings->webhook_secret) ? $settings->webhook_secret : '';
     }
 
     /**
@@ -111,7 +113,49 @@ class MeprPaystackAPI
      */
     public function validate_webhook($input)
     {
-        return $_SERVER['HTTP_X_PAYSTACK_SIGNATURE'] == hash_hmac('sha512', $input, $this->secret_key);
+        if ($this->webhook_secret !== '' && isset($_SERVER['HTTP_PAYSTACK_SIGNATURE'])) {
+            return self::verify_signature($_SERVER['HTTP_PAYSTACK_SIGNATURE'], $input, $this->webhook_secret, time());
+        }
+        if (strpos($this->secret_key, 'sk_') === 0 && isset($_SERVER['HTTP_X_PAYSTACK_SIGNATURE'])) {
+            return hash_equals(hash_hmac('sha512', $input, $this->secret_key), $_SERVER['HTTP_X_PAYSTACK_SIGNATURE']);
+        }
+        return false;
+    }
+
+    /**
+     * Verify a Paystack-Signature header: t=<unix seconds>,v1=<key id>:<hex>[,v1=...]
+     *
+     * @param string $header
+     * @param string $body Raw request body
+     * @param string $secret Webhook signing secret (whsec_...)
+     * @param int $now
+     * @return boolean
+     */
+    public static function verify_signature($header, $body, $secret, $now)
+    {
+        $timestamp = '';
+        $signatures = array();
+        foreach (explode(',', $header) as $part) {
+            $pair = explode('=', trim($part), 2);
+            if (count($pair) !== 2) {
+                continue;
+            }
+            if ($pair[0] === 't') {
+                $timestamp = $pair[1];
+            } elseif ($pair[0] === 'v1' && strpos($pair[1], ':') !== false) {
+                $signatures[] = substr($pair[1], strpos($pair[1], ':') + 1);
+            }
+        }
+        if (!preg_match('/^\d+$/', $timestamp) || abs($now - (int) $timestamp) > 300) {
+            return false;
+        }
+        $expected = hash_hmac('sha512', $timestamp . '.' . $body, $secret);
+        foreach ($signatures as $signature) {
+            if (hash_equals($expected, $signature)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
